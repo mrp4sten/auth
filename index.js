@@ -10,6 +10,8 @@ const app = express()
 
 app.use(express.json())
 
+const signToken = (idUser) => jwt.sign({ _id: idUser }, 'secret')
+
 app.post('/register', async (req, res) => {
     const { body } = req
     console.log({ body })
@@ -23,7 +25,8 @@ app.post('/register', async (req, res) => {
         const hashed = await bcrypt.hash(body.password, salt)
         const user = await User.create({ email: body.email, password: hashed, salt: salt })
         
-        res.send({ _id: user._id })
+        const signed = signToken(user._id)
+        res.status(201).send(signed)
 
     } catch (err) {
         console.error(err)
