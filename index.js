@@ -14,7 +14,6 @@ const signToken = (idUser) => jwt.sign({ _id: idUser }, 'secret')
 
 app.post('/register', async (req, res) => {
     const { body } = req
-    console.log({ body })
     try {
         const isUser = await User.findOne({ email: body.email }) 
         if (isUser) {
@@ -30,6 +29,27 @@ app.post('/register', async (req, res) => {
 
     } catch (err) {
         console.error(err)
+        res.status(500).send(err.message)
+    }
+})
+
+app.post('/login', async (req, res) => {
+    const { body } = req
+    try {
+        const user = await User.findOne({ email: body.email })
+        if(user) {
+            const isMatch = await bcrypt.compare(body.password, user.password)
+            if (isMatch) {
+                const signed = signToken(user._id)
+                res.status(200).send(signed)
+            } else {
+                res.status(403).send('User or password incorrect')
+            }   
+        } else {
+            res.status(403).send('User or password incorrect')
+        }
+    } catch (err) {
+        console.log(err)
         res.status(500).send(err.message)
     }
 })
