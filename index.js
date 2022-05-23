@@ -75,6 +75,15 @@ app.get('/JwtValidation', isAuthenticated, (req, res) => {
     res.send(req.auth)
 })
 
+app.use((err, req, res, nex) => {
+    console.error('ERROR', err.stack)
+    next(err)
+})
+
+app.use((err, req, res, nex) => {
+    res.send('An error occurred')
+})
+
 app.listen(3000, () => {
     console.log('Listening on port 3000')
 })
